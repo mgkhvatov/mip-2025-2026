@@ -1,8 +1,8 @@
 ---
 ## Front matter
 lang: ru-RU
-title: Лабораторная работа №4
-subtitle: Задание для самостоятельного выполнения
+title: Лабораторная работа №5
+subtitle: Модель эпидемии (SIR)
 author:
   - Хватов М. Г.
 institute:
@@ -48,282 +48,151 @@ header-includes:
 
 ## Цель работы
 
-Выполнить задание для самостоятельного выполнения.
+Построить модель SIR в *xcos* и OpenModelica.
 
 ## Задание
 
-1. Для приведённой схемы разработать имитационную модель в пакете NS-2;
-2. Построить график изменения размера окна TCP (в Xgraph и в GNUPlot);
-3. Построить график изменения длины очереди и средней длины очереди на первом
-маршрутизаторе;
-4. Оформить отчёт о выполненной работе.
+1. Реализовать модель SIR в в *xcos*;
+2. Реализовать модель SIR с помощью блока Modelica в в *xcos*;
+3. Реализовать модель SIR в OpenModelica;
+4. Реализовать модель SIR с учётом процесса рождения / гибели особей в xcos (в том числе и с использованием блока Modelica), а также в OpenModelica;
+5. Построить графики эпидемического порога при различных значениях параметров модели (в частности изменяя параметр $\mu$);
+6. Сделать анализ полученных графиков в зависимости от выбранных значений параметров модели.
 
 ## Выполнение лабораторной работы
 
-Описание моделируемой сети:
+$$
+\begin{cases}
+  \dot s = - \beta s(t)i(t);
+  \dot i = \beta s(t)i(t) - \nu i(t);
+  \dot r = \nu i(t),
+\end{cases}
+$$
 
-- сеть состоит из N TCP-источников, N TCP-приёмников, двух маршрутизаторов
-R1 и R2 между источниками и приёмниками (N — не менее 20);
-- между TCP-источниками и первым маршрутизатором установлены дуплексные
-соединения с пропускной способностью 100 Мбит/с и задержкой 20 мс очередью
-типа DropTail;
-- между TCP-приёмниками и вторым маршрутизатором установлены дуплексные
-соединения с пропускной способностью 100 Мбит/с и задержкой 20 мс очередью
-типа DropTail;
+где $\beta$ -- скорость заражения, $\nu$ -- скорость выздоровления.
 
-## Выполнение лабораторной работы
+## Реализация модели в xcos
 
-- между маршрутизаторами установлено симплексное соединение (R1–R2) с пропускной способностью 20 Мбит/с и задержкой 15 мс очередью типа RED, размером буфера 300 пакетов; в обратную сторону — симплексное соединение (R2–R1) с пропускной способностью 15 Мбит/с и задержкой 20 мс очередью типа DropTail;
-- данные передаются по протоколу FTP поверх TCPReno;
-- параметры алгоритма RED: $q_min = 75, q_max = 150, q_w = 0, 002, p_max = 0.1$;
-- максимальный размер TCP-окна 32; размер передаваемого пакета 500 байт; время
-моделирования — не менее 20 единиц модельного времени.
+Зафиксируем начальные данные: $\beta = 1, \, \nu = 0,3, s(0) = 0,999, \, i(0) = 0,001, \, r(0) = 0.$
 
-## Выполнение лабораторной работы
+## Реализация модели в xcos
 
-```
-# создание объекта Simulator
-set ns [new Simulator]
-# открытие на запись файла out.nam для визуализатора nam
-set nf [open out.nam w]
-# все результаты моделирования будут записаны в переменную nf
-$ns namtrace-all $nf
-# открытие на запись файла трассировки out.tr
-# для регистрации всех событий
-set f [open out.tr w]
-# все регистрируемые события будут записаны в переменную f
-$ns trace-all $f
+![Задание переменных окружения в xcos](image/1.png){#fig:001 width=70%}
 
-Agent/TCP set window_ 32
-Agent/TCP set pktSize_ 500
-```
+## Реализация модели в xcos
 
-## Выполнение лабораторной работы
+![Модель SIR в xcos](image/2.png){#fig:002 width=70%}
 
-```
-# процедура finish
-proc finish {} {
-	global tchan_
-	# подключение кода AWK:
-	set awkCode {
-	{
-		if ($1 == "Q" && NF>2) {
-			print $2, $3 >> "temp.q";
-			set end $2
-	}
-		else if ($1 == "a" && NF>2)
-			print $2, $3 >> "temp.a";
-	}
-}
-```
+## Реализация модели в xcos
 
-## Выполнение лабораторной работы
+![Задание начальных значений в блоках интегрирования](image/3.png){#fig:003 width=70%}
+
+## Реализация модели в xcos
+
+![Задание начальных значений в блоках интегрирования](image/4.png){#fig:004 width=70%}
+
+## Реализация модели в xcos
+
+![Задание конечного времени интегрирования в xcos](image/5.png){#fig:005 width=70%}
+
+## Реализация модели в xcos
+
+![Эпидемический порог модели SIR при $\beta = 1, \nu = 0.3$](image/6.png){#fig:006 width=70%}
+
+## Реализация модели с помощью блока Modelica в xcos
+
+![Модель SIR в xcos с применением блока Modelica](image/7.png){#fig:007 width=70%}
+
+## Реализация модели с помощью блока Modelica в xcos
+
+![Параметры блока Modelica для модели SIR](image/8.png){#fig:008 width=50%}
+
+## Реализация модели с помощью блока Modelica в xcos
+
+![Параметры блока Modelica для модели SIR](image/9.png){#fig:009 width=50%}
+
+## Реализация модели с помощью блока Modelica в xcos
+
+![Эпидемический порог модели SIR при $\beta = 1, \nu = 0.3$](image/10.png){#fig:010 width=70%}
+
+## Упражнение
 
 ```
-exec rm -f temp.q temp.a
-exec touch temp.a temp.q
-
-exec awk $awkCode all.q
-
-# Запуск xgraph с графиками окна TCP и очереди:
-exec xgraph -fg pink -bg purple -bb -tk -x time -t "TCPRenoCWND" WindowVsTimeRenoOne &
-exec xgraph -fg pink -bg purple -bb -tk -x time -t "TCPRenoCWND" WindowVsTimeRenoAll &
-exec xgraph -bb -tk -x time -y queue temp.q &
-exec xgraph -bb -tk -x time -y queue temp.a &
-exec nam out.nam &
-exit 0
-}
+  parameter Real I_0 = 0.001;
+  parameter Real R_0 = 0;
+  parameter Real S_0 = 0.999;
+  parameter Real beta = 1;
+  parameter Real nu = 0.3;
+  parameter Real mu = 0.5;
+  Real s(start=S_0);
+  Real i(start=I_0);
+  Real r(start=R_0);
+  
+equation
+  der(s)=-beta*s*i;
+  der(i)=beta*s*i-nu*i;
+  der(r)=nu*i;
 ```
 
-## Выполнение лабораторной работы
+## Упражнение
+
+![Эпидемический порог модели SIR при $\beta = 1, \nu = 0.3$](image/11.png){#fig:012 width=70%}
+
+## Задание для самостоятельного выполнения
+
+$$
+\begin{cases}
+  \dot s = - \beta s(t)i(t) + \mu (N - s(t)); 
+  \dot i = \beta s(t)i(t) - \nu i(t) - \mu i(t);
+  \dot r = \nu i(t) - \mu r(t),
+\end{cases}
+$$
+
+где $\mu$ — константа, которая равна коэффициенту смертности и рождаемости.
+
+## Задание для самостоятельного выполнения
+
+![Модель SIR с учетом демографических процессов в xcos](image/13.png){#fig:013 width=60%}
+
+## Задание для самостоятельного выполнения
+
+![График модели SIR с учетом демографических процессов](image/14.png){#fig:014 width=70%}
+
+## Задание для самостоятельного выполнения
+
+![Модель SIR с учетом демографических процессов в xcos с применением блока Modelica](image/15.png){#fig:015 width=70%}
+
+## Задание для самостоятельного выполнения
+
+![Параметры блока Modelica для модели SIR с учетом демографических процессов](image/16.png){#fig:016 width=50%}
+
+## Задание для самостоятельного выполнения
+
+![Параметры блока Modelica для модели SIR с учетом демографических процессов](image/17.png){#fig:017 width=50%}
+
+## Задание для самостоятельного выполнения
+
+![График модели SIR с учетом демографических процессов](image/18.png){#fig:018 width=60%}
+
+## Задание для самостоятельного выполнения
 
 ```
-# Формирование файла с данными о размере окна TCP:
-proc plotWindow {tcpSource file} {
-	global ns
-	set time 0.01
-	set now [$ns now]
-	set cwnd [$tcpSource set cwnd_]
-	puts $file "$now $cwnd"
-	$ns at [expr $now+$time] "plotWindow $tcpSource $file"
-}
+  parameter Real I_0 = 0.001;
+  parameter Real R_0 = 0;
+  parameter Real S_0 = 0.999;
+  parameter Real beta = 1;
+  parameter Real nu = 0.3;
+  parameter Real mu = 0.5;
+  Real s(start=S_0);
+  Real i(start=I_0);
+  Real r(start=R_0);
+  
+equation
+  der(s)=-beta*s*i + mu*i + mu*r;
+  der(i)=beta*s*i-nu*i - mu*i;
+  der(r)=nu*i - mu*r;
 ```
-
-## Выполнение лабораторной работы
-
-```
-set r1 [$ns node]
-set r2 [$ns node]
-$ns simplex-link $r1 $r2 20Mb 15ms RED
-$ns simplex-link $r2 $r1 15Mb 20ms DropTail
-$ns queue-limit $r1 $r2 300
-
-set N 30
-for {set i 0} {$i < $N} {incr i} {
-	set n1($i) [$ns node]
-	$ns duplex-link $n1($i) $r1 100Mb 20ms DropTail
-	set n2($i) [$ns node]
-	$ns duplex-link $n2($i) $r2 100Mb 20ms DropTail
-	set tcp($i) [$ns create-connection TCP/Reno $n1($i) TCPSink $n2($i) $i]
-	set ftp($i) [$tcp($i) attach-source FTP]
-}
-```
-
-## Выполнение лабораторной работы
-
-```
-# Мониторинг размера окна TCP:
-set windowVsTimeOne [open WindowVsTimeRenoOne w]
-set windowVsTimeAll [open WindowVsTimeRenoAll w]
-
-set qmon [$ns monitor-queue $r1 $r2 [open qm.out w] 0.1];
-[$ns link $r1 $r2] queue-sample-timeout;
-
-# Мониторинг очереди:
-set redq [[$ns link $r1 $r2] queue]
-$redq set thresh_ 75
-$redq set maxthresh_ 150
-$redq set q_weight_ 0.002
-$redq set linterm_ 10
-
-set tchan_ [open all.q w]
-$redq trace curq_
-$redq trace ave_
-$redq attach $tchan_
-```
-
-## Выполнение лабораторной работы
-
-```
-for {set i 0} {$i < $N} {incr i} {
-	$ns at 0.0 "$ftp($i) start"
-	$ns at 0.0 "plotWindow $tcp($i) $windowVsTimeAll"
-}
-
-$ns at 0.0 "plotWindow $tcp(1) $windowVsTimeOne"
-
-# at-событие для планировщика событий, которое запускает
-# процедуру finish через 20s после начала моделирования
-$ns at 20.0 "finish"
-# запуск модели
-$ns run
-```
-
-## Выполнение лабораторной работы
-
-![Схема моделируемой сети при N=30](image/1.png){#fig:001 width=60%}
-
-## Выполнение лабораторной работы
-
-![Изменение размера окна TCP на линке 1-го источника при N=30](image/2.png){#fig:002 width=60%}
-
-## Выполнение лабораторной работы
-
-![Изменение размера окна TCP на всех источниках при N=30](image/3.png){#fig:003 width=50%}
-
-## Выполнение лабораторной работы
-
-![Изменение размера длины очереди на линке (R1–R2) при N=30](image/4.png){#fig:004 width=60%}
-
-## Выполнение лабораторной работы
-
-![Изменение размера средней длины очереди на линке (R1–R2) при N=30](image/5.png){#fig:005 width=60%}
-
-## Выполнение лабораторной работы
-
-```
-#!/usr/bin/gnuplot -persist
-# задаём текстовую кодировку,
-# тип терминала, тип и размер шрифта
-
-set encoding utf8
-set term pngcairo font "Helvetica,9"
-```
-
-## Выполнение лабораторной работы
-
-```
-# задаём выходной файл графика
-set out 'window_1.png'
-
-# задаём название графика
-set title "Изменение размера окна TCP на линке 1-го источника при N=30"
-
-# подписи осей графика
-set xlabel "t[s]" font "Helvetica, 10"
-set ylabel "CWND [pkt]" font "Helvetica, 10"
-
-# построение графика, используя значения
-# 1-го и 2-го столбцов файла WindowVsTimeRenoOne
-plot "WindowVsTimeRenoOne" using ($1):($2) with lines title "Размер окна TCP"
-```
-
-## Выполнение лабораторной работы
-
-```
-# задаём выходной файл графика
-set out 'window_2.png'
-
-# задаём название графика
-set title "Изменение размера окна TCP на всех N источниках  при N=30"
-
-# построение графика, используя значения
-# 1-го и 2-го столбцов файла WindowVsTimeRenoAll
-plot "WindowVsTimeRenoAll" using ($1):($2) with lines title "Размер окна TCP"
-```
-
-## Выполнение лабораторной работы
-
-```
-# задаём выходной файл графика
-set out 'queue.png'
-
-# задаём название графика
-set title "Изменение размера длины очереди на линке (R1–R2)"
-
-# подписи осей графика
-set xlabel "t[s]" font "Helvetica, 10"
-set ylabel "Queue Length [pkt]" font "Helvetica, 10"
-
-# построение графика, используя значения
-# 1-го и 2-го столбцов файла temp.q
-plot "temp.q" using ($1):($2) with lines title "Текущая длина очереди"
-```
-
-## Выполнение лабораторной работы
-
-```
-# задаём выходной файл графика
-set out 'av_queue.png'
-
-# задаём название графика
-set title "Изменение размера средней длины очереди на линке (R1–R2)"
-
-# подписи осей графика
-set xlabel "t[s]" font "Helvetica, 10"
-set ylabel "Queue Avg Length [pkt]" font "Helvetica, 10"
-
-# построение графика, используя значения
-# 1-го и 2-го столбцов файла temp.a
-plot "temp.a" using ($1):($2) with lines title "Средняя длина очереди"
-```
-
-## Выполнение лабораторной работы
-
-![Изменение размера окна TCP на линке 1-го источника при N=30](image/6.png){#fig:006 width=60%}
-
-## Выполнение лабораторной работы
-
-![Изменение размера окна TCP на всех источниках при N=30](image/7.png){#fig:007 width=60%}
-
-## Выполнение лабораторной работы
-
-![Изменение размера длины очереди на линке (R1–R2) при N=30](image/8.png){#fig:008 width=60%}
-
-## Выполнение лабораторной работы
-
-![Изменение размера средней длины очереди на линке (R1–R2) при N=30](image/9.png){#fig:009 width=60%}
 
 ## Выводы
 
-В результате выполнения данной лабораторной работы была разработана имитационная модель в пакете NS-2, построены графики изменения размера окна TCP, изменения длины очереди и средней длины очереди.
+В процессе выполнения данной лабораторной работы была построена модель SIR в *xcos*
