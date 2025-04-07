@@ -1,0 +1,96 @@
+CPN Tools state space report for:
+<unsaved net>
+Report generated: Mon Apr  7 12:15:27 2025
+
+
+ Statistics
+------------------------------------------------------------------------
+
+  State Space
+     Nodes:  11
+     Arcs:   30
+     Secs:   0
+     Status: Full
+
+  Scc Graph
+     Nodes:  1
+     Arcs:   0
+     Secs:   0
+
+
+ Boundedness Properties
+------------------------------------------------------------------------
+
+  Best Integer Bounds
+                             Upper      Lower
+     philosopher'philisopher_thinks 1
+                             5          3
+     philosopher'philosopher_eats 1
+                             2          0
+     philosopher'sticks_on_table 1
+                             5          1
+
+  Best Upper Multi-set Bounds
+     philosopher'philisopher_thinks 1
+                         1`ph(1)++
+1`ph(2)++
+1`ph(3)++
+1`ph(4)++
+1`ph(5)
+     philosopher'philosopher_eats 1
+                         1`ph(1)++
+1`ph(2)++
+1`ph(3)++
+1`ph(4)++
+1`ph(5)
+     philosopher'sticks_on_table 1
+                         1`st(1)++
+1`st(2)++
+1`st(3)++
+1`st(4)++
+1`st(5)
+
+  Best Lower Multi-set Bounds
+     philosopher'philisopher_thinks 1
+                         empty
+     philosopher'philosopher_eats 1
+                         empty
+     philosopher'sticks_on_table 1
+                         empty
+
+
+ Home Properties
+------------------------------------------------------------------------
+
+  Home Markings
+     All
+
+
+ Liveness Properties
+------------------------------------------------------------------------
+
+  Dead Markings
+     None
+
+  Dead Transition Instances
+     None
+
+  Live Transition Instances
+     All
+
+
+ Fairness Properties
+------------------------------------------------------------------------
+
+  Impartial Transition Instances
+     philosopher'put_sticks 1
+     philosopher'take_sticks 1
+
+  Fair Transition Instances
+     None
+
+  Just Transition Instances
+     None
+
+  Transition Instances with No Fairness
+     None
